@@ -85,7 +85,10 @@ angular.module('ngCsv.directives').
       link: function (scope, element, attrs) {
         function doClick() {
           var charset = scope.charset || "utf-8";
-          var blob = new Blob([scope.csv], {
+          var utf8Array = new TextEncoder().encode(scope.csv);
+          var conv = Encoding.convert(utf8Array, charset);
+          var encArray = new Uint8Array(conv);
+          var blob = new Blob([encArray], {
             type: "text/csv;charset="+ charset + ";"
           });
 

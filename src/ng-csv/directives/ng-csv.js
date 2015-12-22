@@ -84,8 +84,18 @@ angular.module('ngCsv.directives').
       ],
       link: function (scope, element, attrs) {
         function doClick() {
+          function unicodeStringToTypedArray(s) {
+            var escstr = encodeURIComponent(s);
+            var binstr = escstr.replace(/%([0-9A-F]{2})/g, function(match, p1) {
+              return String.fromCharCode('0x' + p1);
+            });
+            return new Uint8Array(Array.prototype.map.call(binstr, function(ch) {
+              return ch.charCodeAt(0);
+            }));
+          }
+
           var charset = scope.charset || "utf-8";
-          var utf8Array = new TextEncoder().encode(scope.csv);
+          var utf8Array = unicodeStringToTypedArray(scope.csv);
           var conv = Encoding.convert(utf8Array, charset);
           var encArray = new Uint8Array(conv);
           var blob = new Blob([encArray], {
